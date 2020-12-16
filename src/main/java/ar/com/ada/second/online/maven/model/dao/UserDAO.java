@@ -15,7 +15,7 @@ import lombok.Setter;
 public class UserDAO {
 
 
-    private Integer Id;
+    private Integer id;
     private String nickname;
     private String email;
 
