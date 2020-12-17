@@ -1,4 +1,4 @@
-package ar.com.ada.second.online.maven.model.dao;
+package ar.com.ada.second.online.maven.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,4 +17,8 @@ public class UserDTO {
     private String nickname;
     private String email;
 
+    public UserDTO(String nickname, String email) {
+        this.nickname = nickname;
+        this.email = email;
+    }
 }

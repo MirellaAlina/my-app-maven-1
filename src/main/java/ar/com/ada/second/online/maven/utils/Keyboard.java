@@ -1,5 +1,7 @@
 package ar.com.ada.second.online.maven.utils;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -43,7 +45,7 @@ public class Keyboard {
             try {
                 System.out.println("? ");
                 txt = keyboard.nextLine().trim();
-                while (!txt.isEmpty() && !txt.matches("^[A-Za-záéíóúÁÉÍÓÚñÑ\\s]+$")) {
+                while (!txt.isEmpty() && !txt.matches("^[A-Za-záéíóúÁÉÍÓÚñÑ@\\.\\s]+$")) {
                     invalidData();
                     txt = keyboard.nextLine().trim();
                 }
@@ -56,6 +58,8 @@ public class Keyboard {
 
         return txt;
     }
+
+// TODO: 16/12/2020  getInputEmail
 
     public static Integer getInputInteger() {
         Scanner keyboard = getInstance();
