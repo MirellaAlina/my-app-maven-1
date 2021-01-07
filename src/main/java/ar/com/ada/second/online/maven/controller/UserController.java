@@ -68,14 +68,22 @@ public class UserController {
 //        UserDTO.setNickname(dataNewUser.get("nickname"));
 //        UserDTO.setEmail(dataNewUser.get("email"));
 
-        System.out.println("Before to save:");
-        System.out.println(userDTO.toString());
+        // validacion de registro en la DB
+        try {
+            jpaUserDAO.findByEmailOrNickname(userDTO.getEmail(), userDTO.getNickname());
+        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+            userView.existingUser();
+            return;
+        }
+
         UserDAO userDAO = UserDAO.toDao(userDTO);
 
         jpaUserDAO.save(userDAO);
-        System.out.println("After to save:");
-        System.out.println(userDAO.toString());
 
+        userDTO.setId(userDAO.getId());
+
+        userView.showNewUser(userDTO);
     }
 
 
