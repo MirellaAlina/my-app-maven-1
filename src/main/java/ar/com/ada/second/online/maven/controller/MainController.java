@@ -16,7 +16,7 @@ public class MainController {
         return mainController;
     }
 
-    public void init() {
+    public void init() throws Exception {
         boolean shouldItStay = true;
         mainView.showTitleApp();
 
