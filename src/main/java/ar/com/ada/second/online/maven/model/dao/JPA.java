@@ -3,6 +3,7 @@ package ar.com.ada.second.online.maven.model.dao;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 import java.util.function.Consumer;
 
 public abstract class JPA {
@@ -36,4 +37,7 @@ public abstract class JPA {
 
         closeConnection();
     }
+
+
+
 }
