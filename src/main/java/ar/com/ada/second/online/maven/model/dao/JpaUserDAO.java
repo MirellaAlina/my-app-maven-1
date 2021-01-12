@@ -11,6 +11,7 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO>{
     private static JpaUserDAO jpaUserDAO;
 
 
+
     private JpaUserDAO(){
 
     }
@@ -43,6 +44,11 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO>{
     public void save(UserDAO userDAO) {
         Consumer<EntityManager> persistUser = entityManager -> entityManager.persist(userDAO);
         executeInsideTransaction(persistUser);
+
+        if (userDAO.getId() == null)
+            executeInsideTransaction(entityManager -> entityManager.persist(userDAO));
+        else
+            executeInsideTransaction(entityManager -> entityManager.merge(userDAO));
     }
 
     @Override
@@ -53,6 +59,15 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO>{
 
         closeConnection();
         return count;
+    }
+
+    @Override
+    public Optional<UserDAO> findById(Integer id) {
+        openConnection();
+        UserDAO userDAO = entityManager.find(UserDAO.class, id);
+        closeConnection();
+
+        return Optional.ofNullable(userDAO);
     }
 
     public List<UserDAO> findAll(Integer from, Integer limit) {
