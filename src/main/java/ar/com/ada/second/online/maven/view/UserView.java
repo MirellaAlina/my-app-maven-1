@@ -33,6 +33,7 @@ public class UserView {
         System.out.println("| 1 | Crear usuario");
         System.out.println("| 2 | Lista de usuarios");
         System.out.println("| 3 | Editar usuario");
+        System.out.println("| 4 | Eliminar usuario");
         System.out.println("| 5 | Regresar al menú principal");
         return Keyboard.getInputInteger();
 
@@ -89,8 +90,8 @@ public class UserView {
         });
         st.print();
 
-        if (optionSelectEditOrDelete != null && !optionSelectEditOrDelete.isEmpty())
-            paginator.set(paginator.size() - 2, optionSelectEditOrDelete);
+//        if (optionSelectEditOrDelete != null && !optionSelectEditOrDelete.isEmpty())
+//            paginator.set(paginator.size() - 2, optionSelectEditOrDelete);
 
         System.out.println("\n+----------------------------------------+");
         paginator.forEach(page -> System.out.print(page + " "));
@@ -150,5 +151,30 @@ public class UserView {
 
         Keyboard.pressEnterKeyToContinue();
     }
+
+    public Boolean AreYouSureToremoveIt(UserDAO dao) {
+        System.out.println("\n ¿Seguro que desea eliminar el siguiente registro?");
+        System.out.printf("id: %d", dao.getId());
+        System.out.printf("\nEmail: %s", dao.getEmail());
+        System.out.printf("\nNickname: %s\n", dao.getNickname());
+
+        System.out.println("| 1 | Si\n| 2 | No");
+
+        return Keyboard.getInputInteger() == 1;
     }
+
+    public void userHasBeenDeletedSuccessfullyRemoved() {
+        System.out.println("Se ha eliminado el registro exitosamente!");
+    }
+
+    public void errorWhenDeletingUser(String delete) {
+        System.out.println("Oops!! hubo un error al eliminar el registro, intentelo de nuevo.");
+    }
+
+    public void editOrDeleteUserCanceled(String action) {
+        action = Paginator.EDIT.equals(action) ? "edicion" : "eliminacion";
+        System.out.println("se ha cancelado la " + action + "del usuario\n");
+        Keyboard.pressEnterKeyToContinue();
+    }
+}
 

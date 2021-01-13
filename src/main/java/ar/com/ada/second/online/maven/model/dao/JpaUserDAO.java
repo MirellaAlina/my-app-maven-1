@@ -6,24 +6,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class JpaUserDAO extends JPA implements DAO<UserDAO>{
+public class JpaUserDAO extends JPA implements DAO<UserDAO> {
 
     private static JpaUserDAO jpaUserDAO;
 
 
-
-    private JpaUserDAO(){
+    private JpaUserDAO() {
 
     }
 
-    public static JpaUserDAO getInstance(){
+    public static JpaUserDAO getInstance() {
         if (jpaUserDAO == null) jpaUserDAO = new JpaUserDAO();
         return jpaUserDAO;
     }
-    
+
     public void findByEmailOrNickname(String email, String nickname) throws Exception {
-    openConnection();
-    // SELECT * FROM User WHERE email=? OR nickname=?
+        openConnection();
+        // SELECT * FROM User WHERE email=? OR nickname=?
         TypedQuery<UserDAO> query = entityManager.createQuery(
                 "SELECT u FROM UserDAO u WHERE u.email =:email OR u.nickname =:nickname",
                 UserDAO.class
@@ -35,7 +34,7 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO>{
 
         closeConnection();
 
-        if (byEmailAndNickname.isPresent()){
+        if (byEmailAndNickname.isPresent()) {
             throw new Exception("Ya existe un usuario con ese email y/o nickname");
         }
     }
@@ -52,7 +51,7 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO>{
     }
 
     @Override
-    public Integer  getTotalRecords() {
+    public Integer getTotalRecords() {
         openConnection();
         Object singleResult = entityManager.createNativeQuery("SELECT COUNT(*) FROM User").getSingleResult();
         Integer count = singleResult != null ? Integer.parseInt(singleResult.toString()) : 0;
@@ -68,6 +67,19 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO>{
         closeConnection();
 
         return Optional.ofNullable(userDAO);
+    }
+
+    @Override
+    public Boolean delete(UserDAO dao) {
+        openConnection();
+        UserDAO userToDelete = entityManager.merge(dao);
+
+        executeInsideTransaction(entityManager -> entityManager.remove(userToDelete));
+        closeConnection();
+
+        Optional<UserDAO> verifyById = findById(dao.getId());
+
+        return !verifyById.isPresent();
     }
 
     public List<UserDAO> findAll(Integer from, Integer limit) {

@@ -10,4 +10,6 @@ public interface DAO<T> {
 
     Optional<T> findById(Integer Id);
 
+    Boolean delete(T t);
+
 }
