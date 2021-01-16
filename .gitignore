@@ -1,4 +1,4 @@
 .idea
 target
 src/main/resources/applications.properties
-src/main/resources/META-INF/persistance.xml
+src/main/resources/META-INF/persistence.xml

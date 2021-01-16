@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 // DAO : DATA ACCESS OBJECT
 
@@ -30,6 +31,9 @@ public class UserDAO {
 
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "user")
+    private List<PostDAO> posts;
 
     public UserDAO(String nickname, String email) {
         this.nickname = nickname;

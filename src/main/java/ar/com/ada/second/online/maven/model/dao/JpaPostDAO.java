@@ -1,0 +1,36 @@
+package ar.com.ada.second.online.maven.model.dao;
+
+import java.util.Optional;
+
+public class JpaPostDAO extends JPA implements DAO<PostDAO>{
+
+    private static JpaPostDAO jpaPostDAO;
+
+    private  JpaPostDAO(){
+    }
+
+    public static JpaPostDAO getInstance(){
+        if (jpaPostDAO == null) jpaPostDAO = new JpaPostDAO();
+        return jpaPostDAO;
+    }
+
+    @Override
+    public void save(PostDAO postDAO) {
+
+    }
+
+    @Override
+    public Integer getTotalRecords() {
+        return null;
+    }
+
+    @Override
+    public Optional<PostDAO> findById(Integer Id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Boolean delete(PostDAO postDAO) {
+        return null;
+    }
+}
