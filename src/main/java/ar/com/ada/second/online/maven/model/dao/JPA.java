@@ -10,19 +10,19 @@ public abstract class JPA {
 
     protected static EntityManager entityManager;
 
-    protected void openConnection(){
+    protected void openConnection() {
         if (entityManager == null || !entityManager.isOpen())
             entityManager = Persistence
                     .createEntityManagerFactory("my-persistence-unit")
                     .createEntityManager();
     }
 
-    protected void closeConnection(){
+    protected void closeConnection() {
         if (entityManager != null && entityManager.isOpen())
             entityManager.close();
     }
 
-    protected void executeInsideTransaction(Consumer<EntityManager> action){
+    protected void executeInsideTransaction(Consumer<EntityManager> action) {
         openConnection();
         final EntityTransaction transaction = entityManager.getTransaction();
         try {
@@ -30,14 +30,13 @@ public abstract class JPA {
             action.accept(entityManager);
             transaction.commit();
 
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             transaction.rollback();
             System.out.println(e.toString());
         }
 
         closeConnection();
     }
-
 
 
 }
