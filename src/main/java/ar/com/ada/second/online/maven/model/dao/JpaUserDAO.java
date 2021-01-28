@@ -97,6 +97,7 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO> {
         return !verifyById.isPresent();
     }
 
+    @Override
     public List<UserDAO> findAll(Integer from, Integer limit) {
         openConnection();
         TypedQuery<UserDAO> query = entityManager.createQuery("SELECT u FROM UserDAO u", UserDAO.class);

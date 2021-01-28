@@ -6,17 +6,22 @@ import ar.com.ada.second.online.maven.model.dao.PostDAO;
 import ar.com.ada.second.online.maven.model.dao.UserDAO;
 import ar.com.ada.second.online.maven.model.dto.PostDTO;
 import ar.com.ada.second.online.maven.model.dto.UserDTO;
+import ar.com.ada.second.online.maven.utils.Keyboard;
+import ar.com.ada.second.online.maven.utils.Paginator;
 import ar.com.ada.second.online.maven.view.MainView;
 import ar.com.ada.second.online.maven.view.PostView;
 
+import java.util.List;
+import java.util.Optional;
+
 public class PostController {
-    private  static PostController postController;
+    private static PostController postController;
     private PostView postView = PostView.getInstance();
     private JpaPostDAO jpaPostDAO = JpaPostDAO.getInstance();
     private MainView mainView = MainView.getInstance();
     private JpaUserDAO jpaUserDAO = JpaUserDAO.getInstance();
 
-    private PostController(){
+    private PostController() {
     }
 
     public static PostController getInstance() {
@@ -24,7 +29,7 @@ public class PostController {
         return postController;
     }
 
-    public void init(){
+    public void init() {
         boolean shouldItStay = true;
         postView.showTitlePostModule();
 
@@ -35,10 +40,10 @@ public class PostController {
                     createPost();
                     break;
                 case 2:
-                    System.out.println("Listar post");
+                    listAllPosts();
                     break;
                 case 3:
-                    System.out.println("Editar post");
+                    editPost();
                     break;
                 case 4:
                     System.out.println("Eliminar post");
@@ -53,7 +58,9 @@ public class PostController {
         }
     }
 
+
     private void createPost() {
+        postView.showTitleNewPost();
         UserDTO authorUser = getAuthorUser();
 
         if (authorUser != null) {
@@ -80,6 +87,13 @@ public class PostController {
 
     }
 
+    private void listAllPosts() {
+        postView.showTitleListPost();
+        UserDTO authorUser = getAuthorUser();
+        printsRecordsPerPage(false, true, authorUser);
+    }
+
+
     private UserDTO getAuthorUser() {
         String nickname = null;
         Boolean hasUserFound = null;
@@ -101,5 +115,119 @@ public class PostController {
         return nickname.equalsIgnoreCase("q") ?
                 null :
                 UserDAO.toDTO(byNickname);
+    }
+
+    private Integer printsRecordsPerPage(Boolean hasEditOrDelete, Boolean isHeaderShow, UserDTO authorUser) {
+        int     limit = 4,
+                currentPage = 0,
+                totalRecords,
+                totalPages,
+                idSelected = 0;
+
+        List<PostDAO> posts;
+        List<String> paginator;
+
+        Integer authorUserId = (authorUser != null)
+                ? authorUser.getId()
+                : null;
+
+        boolean shouldGetOut = false;
+
+        while (!shouldGetOut) {
+            totalRecords = jpaPostDAO.getTotalRecords(authorUserId);
+            totalPages = (int)Math.ceil((double) totalRecords / limit);
+            paginator = Paginator.buildPaginator(currentPage, totalPages);
+            posts = (authorUser == null)
+                    ? jpaPostDAO.findAll(currentPage * limit, limit)
+                    : jpaPostDAO.findAllByUser(currentPage * limit, limit, authorUser);
+
+            if (!posts.isEmpty()) {
+                String choice = postView.printPostsPerPage(posts, paginator, isHeaderShow);
+
+                switch (choice) {
+                    case "i":
+                    case "I":
+                        currentPage = 0;
+                        break;
+                    case "a":
+                    case "A":
+                        if (currentPage > 0) currentPage--;
+                        break;
+                    case "s":
+                    case "S":
+                        if (currentPage + 1 < totalPages) currentPage++;
+                        break;
+                    case "u":
+                    case "U":
+                        currentPage = totalPages - 1;
+                        break;
+                    case "q":
+                    case "Q":
+                        shouldGetOut = true;
+                        break;
+                    default:
+                        if (hasEditOrDelete) {
+                            idSelected = Integer.parseInt(choice);
+                            shouldGetOut = true;
+                        } else {
+                            if (choice.matches("^-?\\d+$")) {
+                                int page = Integer.parseInt(choice);
+                                if (page > 0 && page <= totalPages) currentPage = page - 1;
+                            } else Keyboard.invalidData();
+                        }
+                }
+            } else {
+                shouldGetOut = true;
+                postView.postsListNotFound();
+            }
+        }
+
+        return idSelected;
+    }
+
+    private void editPost() {
+        postView.showTitleEditOrDeletePost(Paginator.EDIT);
+        UserDTO authorUser = getAuthorUser();
+        PostDAO postToEdit = getPostToEditOrDelete(Paginator.EDIT, authorUser);
+
+        if (postToEdit != null) {
+            String newPostBody = postView.getDataEditPost(postToEdit);
+
+            if (!newPostBody.isEmpty())
+                postToEdit.setBody(newPostBody);
+
+            jpaPostDAO.save(postToEdit);
+
+            PostDTO postDTO = PostDAO.toDTO(postToEdit);
+
+            postView.showPost(postDTO);
+
+        } else {
+            postView.etitOrDeletehPostCanceled(Paginator.EDIT);
+        }
+    }
+
+    private PostDAO getPostToEditOrDelete(String optionEditOrDelete, UserDTO authorUser) {
+        boolean shouldGetOut = false;
+        Optional<PostDAO> postToEditOrDeleteOptional = Optional.empty();
+        String actionInfo = Paginator.EDIT.equals(optionEditOrDelete) ? "editar" : "eliminar";
+        postView.selectPostIdToEditOrDelete(actionInfo);
+
+        Integer postIdToEditOrDelete = printsRecordsPerPage(true, false, authorUser);
+
+        if (postIdToEditOrDelete != 0) {
+            while (!shouldGetOut) {
+                postToEditOrDeleteOptional = jpaPostDAO.findByIdAndAuthor(postIdToEditOrDelete, authorUser);
+                if (!postToEditOrDeleteOptional.isPresent()) {
+                    postView.postNotExist(postIdToEditOrDelete, authorUser);
+                    postIdToEditOrDelete = postView.postIdSelection(actionInfo);
+                    shouldGetOut = (postIdToEditOrDelete == 0);
+                } else {
+                    shouldGetOut = true;
+                }
+            }
+        }
+
+        return postToEditOrDeleteOptional.isPresent() ? postToEditOrDeleteOptional.get() : null;
     }
 }
