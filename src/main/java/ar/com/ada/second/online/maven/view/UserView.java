@@ -50,7 +50,7 @@ public class UserView {
         System.out.println("Ingrese el nuevo nickname ");
 //        String nickname = Keyboard.getInputString();
 //        data.put("nickname", nickname);
-        data.put("nickname", Keyboard.getInputString());
+        data.put("nickname", Keyboard.getInputAlphaNumeric());
 
         System.out.println("Ingrese el nuevo email ");
         data.put("email", Keyboard.getInputEmail());
