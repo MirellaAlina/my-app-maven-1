@@ -24,7 +24,7 @@ public class JpaPostDAO extends JPA implements DAO<PostDAO> {
         openConnection();
 
         Object singleResult = (userId == null)
-                ? entityManager.createNativeQuery("SELECT COUNT (*) FROM Post").getSingleResult()
+                ? entityManager.createNativeQuery("SELECT COUNT(*) FROM Post").getSingleResult()
                 : entityManager.createNativeQuery("SELECT COUNT(*) FROM Post WHERE User_Id=:userId")
                 .setParameter("userId", userId)
                 .getSingleResult();
